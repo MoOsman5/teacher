@@ -9,13 +9,13 @@ import "./App.css";
 
 // Firebase configuration
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID",
-  measurementId: "YOUR_MEASUREMENT_ID",
+  apiKey: "AIzaSyC28snX29YxoUqRYt5X5UjackWLX56v8Jo",
+  authDomain: "teacher-48ab7.firebaseapp.com",
+  projectId: "teacher-48ab7",
+  storageBucket: "teacher-48ab7.appspot.com",
+  messagingSenderId: "435756635268",
+  appId: "1:435756635268:web:eec517e83df39dc02f1ed1",
+  measurementId: "G-BBS6Q3F628"
 };
 
 // Initialize Firebase app
