@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { getFirestore, collection,getDoc, getDocs ,doc} from "firebase/firestore";
 import SearchIcon from "./SVGs/SearchIcon";
 import videocamera from "./assets/icons/video-camera.png";
 import IdIcon from "./assets/icons/id-card-50.png";
@@ -23,69 +23,47 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 const App = () => {
-  let data = [
-    {
-      id: "1",
-      firstName: "John Doe",
-      lastName: "Smith",
-      url: "https://th.bing.com/th/id/OIP.L8bs33mJBAUBA01wBfJnjQHaHa?rs=1&pid=ImgDetMain",
-    },
-    {
-      id: "2",
-      firstName: "Jane Smith",
-      lastName: "Doe",
-      url: "https://th.bing.com/th/id/OIP.L8bs33mJBAUBA01wBfJnjQHaHa?rs=1&pid=ImgDetMain",
-    },
-  ];
   const [classInfo, setClassInfo] = useState(null);
-  const [teachers, setTeachers] = useState(data);
+  const [teachers, setTeachers] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
 
-  // useEffect(() => {
-  //   const fetchClassInfo = async () => {
-  //     try {
-  //       const docSnap = await db.collection('students/class').doc('ID_CLASS_b3dd914b629d').get();
-  //       if (docSnap.exists()) {
-  //         setClassInfo(docSnap.data());
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching class info:", error);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchClassInfo = async (classId) => {
+      try {
+        const classRef = doc(db, 'class', classId); 
+        const classSnapshot = await getDoc(classRef);
+        if (classSnapshot.exists()) {
+          setClassInfo(classSnapshot.data());
+        } else {
+          console.log('Class not found');
+        }
+      } catch (error) {
+        console.error('Error fetching class information:', error);
+      }
+    };
+    fetchClassInfo('zBvstWRLAThhskH03Zp5');
+  }, [db]);
 
-  //   const fetchTeachers = async () => {
-  //     try {
-  //       const querySnapshot = await db.collection('teachers').get();
-  //       const teachersData = querySnapshot.docs.map(doc => doc.data());
-  //       setTeachers(teachersData);
-  //     } catch (error) {
-  //       console.error("Error fetching teachers:", error);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      try {
+        const teachersCollection = collection(db, "teachers");
+        const querySnapshot = await getDocs(teachersCollection);
+        const teacherData = querySnapshot.docs
+          .filter(doc => doc.data().class_id === 'zBvstWRLAThhskH03Zp5') // Filter teachers by class_id
+          .map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+        setTeachers(teacherData);
+      } catch (error) {
+        console.error('Error fetching teachers:', error);
+      }
+    };
 
-  //   fetchClassInfo();
-  //   fetchTeachers();
-  // }, [db]);
+    fetchTeachers();
+  }, [db]);
 
-  // useEffect(() => {
-  //   const fetchTeachers = async () => {
-  //     try {
-  //       const teachersCollection = collection(db, "teachers");
-  //       const querySnapshot = await getDocs(teachersCollection);
-  //       console.log("querySnapshot.docs:", querySnapshot.docs);
-  //       const teacherData = querySnapshot.docs.map((doc) => ({
-  //         id: doc.id,
-  //         ...doc.data(),
-  //       }));
-  //       console.log("teacherData:", teacherData);
-  //       setTeachers(teacherData);
-  //     } catch (error) {
-  //       console.error("Error fetching teachers:", error);
-  //     }
-  //   };
-
-  //   fetchTeachers();
-  // }, [db]);
 
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
@@ -98,8 +76,9 @@ const App = () => {
 
   return (
     <div>
-      <div className="title"> My Scool logo</div>
-      <div className="title2">Class number 14</div>
+      <div className="title"> My School Logo</div>
+      {console.log('classInfo',classInfo)}
+      <div className="title2">Class number {classInfo?.number}</div>
       <div className="search-bar">
         <SearchIcon />
         <input
@@ -110,10 +89,10 @@ const App = () => {
         />
       </div>
       <ul className="teacher-list">
-        {teachers.map((teacher) => (
+        {filteredTeachers.map((teacher) => (
           <li key={teacher.id}>
             <div className="image-container">
-              <img src={teacher.url} alt="Profile" />
+              <img src={teacher.imageURL} alt="Profile" />
             </div>
             <span>
               {teacher.firstName} {teacher.lastName}
